@@ -5,7 +5,7 @@ IRrecv receiver(RECV_PIN);   // create a receiver object of the IRrecv class
 decode_results results;      // create a results object of the decode_results class
 unsigned int rgb_val[] = {0XFF, 0X00, 0X00}; // rgb_val[RED, BLUE, GREEN]
 int current_timer;
-bool dim = false;
+int pwm;
 
 void setup() {
   // put your setup code here, to run once:
@@ -106,8 +106,13 @@ void loop() {
         current_timer = setTimer(8);
         break;
       case DELAYMODE:
+        pwm += 1;
+        break;
+      case MULTICOLOR_MODE:
         // So for some reason I can't pwm my way unto two signals at the same time
         // when using the IR, the program sort of deadlocks itself.
+        break;
+      default:
         break;
       }
     } else if (receiver.decodedIRData.protocol == UNKNOWN) {
@@ -116,17 +121,31 @@ void loop() {
     Serial.println(results.value, HEX);
     receiver.resume();
   }
+
+  if (pwm > 10)  { pwm = 0; }
+  if (pwm < 0)   { pwm = 0;  }
+
   if (mode) {
       if (timer) {
         if (millis() - timer_displacement >= current_timer * 1000 * 60) {
             mode = false;
             timer = false;
-            Serial.println("DED");
           }
       } else {
-        analogWrite(R_PIN, rgb_val[0]);
-        analogWrite(G_PIN, rgb_val[1]);
-        analogWrite(B_PIN, rgb_val[2]);
+        if (pwm > 0) {
+          analogWrite(R_PIN, rgb_val[0]);
+          analogWrite(G_PIN, rgb_val[1]);
+          analogWrite(B_PIN, rgb_val[2]);  
+          delay(pwm);
+          analogWrite(R_PIN, 0x00);
+          analogWrite(G_PIN, 0x00);
+          analogWrite(B_PIN, 0x00);
+          delay(10-pwm);
+        } else {
+          analogWrite(R_PIN, rgb_val[0]);
+          analogWrite(G_PIN, rgb_val[1]);
+          analogWrite(B_PIN, rgb_val[2]);
+        }    
       }
     } else {
       analogWrite(R_PIN, 0x00);
