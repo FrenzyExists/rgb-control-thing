@@ -1,9 +1,7 @@
 # IR controlled RGB light
 
-Yeah as simple as you can get. Currently can change to a bunch of colors, and includes two timers to set the light off. Also light can finally dim yay
+Yeah as simple as you can get. Currently can change to a bunch of colors, and includes two timers to set the light off and lights can dim by using a counter.
 
-### Current Problems that smol brain can't figure out
+### Challenges
 
-#### Can't do rgb fade
-
-So for some reason I can't make the rgb fade. From what I tested, because of the IR library I'm using, only 1 out of the 3 rgb pins can have their color in a constant change, if you try to otherwise change it well, you sort of deadlock yourself. the program can't detect NEC protocol (which is what my little i-Zoom controller uses) and sets it to UNKNOWN, and to top it off, the decoded signal changes entirely. The other prob I have is that once I somehow manage to get the rgb doing its thing, i can't stop it. So now I'm going into event programming extravaganza in hopes that by changing paradigms i could get the damn thing workingßß
+For this project I used the IR library, which allows you to read or send IR signals under many different protocols. Because of some reason I would never understand, the IR library messes up the analogWrite function, specifically if one of the three outputs are not 255, 0, or 125. When I did, the program deadlocks itself or the NEC protocol changes completely to some random unknown protocol, so I had to use a counter to get it working.
